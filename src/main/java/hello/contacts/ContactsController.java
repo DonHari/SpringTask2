@@ -30,11 +30,7 @@ import java.util.stream.Stream;
 @EnableAutoConfiguration
 public class ContactsController {
 
-
     private ContactRepository contactRepository;
-
-//    @PersistenceContext
-//    EntityManager entityManager;
 
     @Autowired
     public ContactsController(ContactRepository contactRepository) {
@@ -43,11 +39,12 @@ public class ContactsController {
 
     @RequestMapping("/hello/contacts")
     @Transactional(readOnly = true)//только чтение из БД
-    public void greeting(
+    public void contacts(
             @RequestParam(value="nameFilter",
                     required = false//чтобы обработать ошибку, когда параметр не указан (либо указан, но пустой)
             ) String nameFilter,
             HttpServletResponse response) {
+        response.setCharacterEncoding("UTF-8");
         //проверяем заполненность параметра
         if(nameFilter == null || nameFilter.isEmpty()) {
             throw new IllegalArgumentException();//handleBadRequest
@@ -97,7 +94,6 @@ public class ContactsController {
     @ExceptionHandler(IllegalArgumentException.class)
     void handleBadRequest(HttpServletResponse response) throws IOException {
         response.setHeader("Content-type", MediaType.TEXT_HTML_VALUE);
-        response.setCharacterEncoding("UTF-8");
         response.sendError(HttpStatus.BAD_REQUEST.value(), "Parameter \"nameFilter\" is required!");
     }
 
@@ -105,7 +101,6 @@ public class ContactsController {
     @ExceptionHandler(PatternSyntaxException.class)
     void handlePatternSyntaxException(HttpServletResponse response) throws IOException{
         response.setHeader("Content-type", MediaType.TEXT_HTML_VALUE);
-        response.setCharacterEncoding("UTF-8");
         response.sendError(HttpStatus.BAD_REQUEST.value(), "Regular expression incorrect!");
     }
 
@@ -113,7 +108,6 @@ public class ContactsController {
     @ExceptionHandler({IOException.class, UnsupportedEncodingException.class})
     void handleInternalServerError(HttpServletResponse response) throws IOException {
         response.setHeader("Content-type", MediaType.TEXT_HTML_VALUE);
-        response.setCharacterEncoding("UTF-8");
         response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Server error.");
     }
 
